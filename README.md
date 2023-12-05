@@ -1,6 +1,37 @@
+# README for RF-Models-CAM-Evaluation (DRAFT)
+
+This README provides updated instructions and information for the RF-Models-CAM-Evaluation GitHub repository, focusing on Score-CAM implementation for 1D CNNs, especially for models processing RF IQ data.
+
+## Installation
+
+1. **Clone the Repository**: Clone RF-Models-CAM-Evaluation from GitHub.
+2. **Install Dependencies**: Use `pip install -r requirements.txt` to install necessary libraries.
+
+## Assumptions
+
+- **Model and DataLoader**: The repository assumes a specific model and DataLoader structure. Refer to `model.py` and `dataset_oracle` for the existing implementations. Modify these files to adapt to your own model and data format. Add your own model and load it along with your own test dataset.
+
+## Usage
+
+1. **Running CAM Testbench**: Execute `cam_testbench.ipynb` to apply Score-CAM to your model. This notebook evaluates the model's CAMs, emphasizing influential frequencies in decision-making.
+
+## cam_testbench Overview
+
+- **Functionality**: The notebook generates CAMs for 1D CNNs, highlighting crucial time and frequency components in model predictions.
+- **Output Dataframe**: It outputs a dataframe containing comprehensive CAM details, including significant slices and their associated CAM scores.
+
+## Post-Processing
+
+- **Data Visualization**: After running `cam_testbench`, use the saved dataframe in `cam_visualization.ipynb` for visualizing the CAM results, offering a deeper insight into your model's interpretability.
+
+## Conclusion
+
+This repository offers a sophisticated toolset for analyzing RF models, attempting to provide clarity on time frequency components that influence decision-making. Please contact Trudeau.s@northeastern.edu if you have any questions. 
 
 
-# Installation and Usage Guide for RF Model Evaluation Toolkit
+
+
+# Dash WebAPP Visualization --- Installation and Usage Guide 
 
 This guide provides instructions on how to set up and run the RF Model Evaluation Toolkit, a Dash-based web application for visualizing and analyzing RF data.
 
@@ -50,3 +81,4 @@ The RF Model Evaluation Toolkit includes several interactive features for analyz
   - **Constellation Plot**: Provides a scatter plot of the In-phase vs Quadrature components of the IQ data.
 
 - **Interactive Zoom and Pan**: All plots support interactive zooming and panning for detailed analysis.
+RF
