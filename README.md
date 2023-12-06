@@ -32,6 +32,7 @@ This repository offers a sophisticated toolset for analyzing RF models, attempti
 
 
 # Dash WebAPP Visualization --- Installation and Usage Guide 
+![AppVisual](misc_images/Visualization_labels.png)
 
 This guide provides instructions on how to set up and run the RF Model Evaluation Toolkit, a Dash-based web application for visualizing and analyzing RF data.
 
