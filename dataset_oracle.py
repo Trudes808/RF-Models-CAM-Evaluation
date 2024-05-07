@@ -9,7 +9,7 @@ FRACTION = .1
 
 
 class InDistributionTrainDataset(Dataset):
-    def __init__(self, seqs, seq_len=256, data_dir="/raid/backup_storage_oldDGX/ORACLE/mat_files/raw/"):
+    def __init__(self, seqs, seq_len=256, data_dir="/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/"):
         with open(data_dir + "train.pkl", "rb") as f:
             file_dict = pickle.load(f)
         filenames = file_dict["files"]
@@ -46,7 +46,7 @@ class InDistributionTrainDataset(Dataset):
 
 class WildDataset(Dataset):
     def __init__(self, id_seqs, ood_seqs, seq_len=256,
-                 data_dir="/raid/backup_storage_oldDGX/ORACLE/mat_files/raw/"):
+                 data_dir="/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/"):
         self.sequences = []
         self.idxs = [0]
 
@@ -96,7 +96,7 @@ class WildDataset(Dataset):
 
 class InDistributionTestDataset(Dataset):
     def __init__(self, seqs, split, seq_len=256, example_len=2000,
-                 data_dir="/raid/backup_storage_oldDGX/ORACLE/mat_files/raw/"):
+                 data_dir="/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/"):
         with open(data_dir + "train.pkl", "rb") as f:
             file_dict = pickle.load(f)
         filenames = file_dict["files"]
@@ -149,7 +149,7 @@ class InDistributionTestDataset(Dataset):
 
 class InDistributionTestDatasetContinuous(Dataset):
     def __init__(self, seqs, split, seq_len=256, example_len=2000,
-                 data_dir="/raid/backup_storage_oldDGX/ORACLE/mat_files/raw/"):
+                 data_dir="/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/"):
         with open(data_dir + "train.pkl", "rb") as f:
             file_dict = pickle.load(f)
         filenames = file_dict["files"]
@@ -190,7 +190,7 @@ class InDistributionTestDatasetContinuous(Dataset):
 
 class OutOfDistributionDataset(Dataset):
     def __init__(self, split, seen=True, seq_len=256, tran_len=2000,
-                 data_dir="/raid/backup_storage_oldDGX/LORA/Year_1_outdoor/outdoor_dataset_1/mat_files/raw/"):
+                 data_dir="/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/"):
         with open(data_dir + "ood_%s.pkl" % split, "rb") as f:
             file_dict = pickle.load(f)
         filenames = file_dict["files"]
