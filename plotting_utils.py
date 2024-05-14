@@ -34,7 +34,8 @@ class RF_Visualizer():
         self.trans = trans
         self.sample_rate = sample_rate
         self.label = label
-        self.trans_full_arr = dataloader_to_complex_arr(trans)
+        #self.trans_full_arr = dataloader_to_complex_arr(trans)
+        self.trans_full_arr = trans
         
 
     def plotSpectrogram(self, fftWindow, fftSize,winLen,overlap):
