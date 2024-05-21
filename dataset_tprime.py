@@ -330,6 +330,13 @@ class TPrimeDataset(Dataset):
         if self.double_class_label and (type(label) is not list):
             label = [label, label]
         return obs, label
+    
+    def augment_signal_cache_item(self, idx, augmented_signal):
+        #function used only during XAI testing to view point effects on augmenting data
+        dataset = self.ds_info['ds_indexes'][self.ds_type]
+        s_idx = self.ds_info['ixs_maps'][self.ds_type][idx]
+        obs_info = dataset['data'][s_idx]
+        self.signal_cache.put(obs_info['path'], {'np': augmented_signal, 'mat': ''})
 
     # Function to change the shape of obs
     # the input is obs with shape (channel, slice)
