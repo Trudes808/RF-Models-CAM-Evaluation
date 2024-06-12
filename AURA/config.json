@@ -1,0 +1,28 @@
+{
+    "model_path": "/home/sagetrudeau/Projects/XAI/RF-Models-CAM-Evaluation/model/model.baseline_cnn1d.nochan.30.pt",
+    "dataset": {
+        "protocols": ["802_11ax", "802_11b_upsampled", "802_11n", "802_11g"],
+        "noise": true,
+        "snr_db": [30],
+        "raw_path": "/home/user/Projects/t-prime/data/DATASET1_1",
+        "slicelen": 512,
+        "overlap_ratio": 0.0,
+        "postfix": "",
+        "raw_data_ratio": 1.0,
+        "channel": null,
+        "out_mode": "real",
+        "worker_batch_size": 512
+    },
+    "device": "cpu",
+    "model_params": {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "num_epochs": 10
+    },
+    "test_params": {
+        "noise": {
+            "relative_power": 0.001
+        }
+        
+    }
+}

@@ -5,9 +5,28 @@ from embeddings_similarity_module import EmbeddingSimilarity
 from cam_module import ClassActivationMapping
 from collections import defaultdict
 import random
+import json
+import os
 
+def load_config(config_path):
+    with open(config_path, 'r') as config_file:
+        return json.load(config_file)
+
+def save_test_results(results):
+    # Implement the logic to save results to a file or database
+    pass
+
+def print_summary(results):
+    # Summarize test results
+    print("Test Summary:")
+    for result in results:
+        print(f"Index: {result['index']}, Model Output: {result['output']}, Embedding Similarity: {result['embedding_similarity']}, CAM Result: {result['cam_result']}")
+
+#***************************************************      Main           *************************************************************
 if __name__ == "__main__":
-    config_path = "path_to_config.json"
+
+    config_path = "config.json"
+    config = load_config(config_path)
     model = load_pretrained_model()
     dataloader = load_dataloader()
 
@@ -65,13 +84,3 @@ if __name__ == "__main__":
     # # Optionally, save and summarize results
     # save_test_results(test_results)
     # print_summary(test_results)
-
-def save_test_results(results):
-    # Implement the logic to save results to a file or database
-    pass
-
-def print_summary(results):
-    # Summarize test results
-    print("Test Summary:")
-    for result in results:
-        print(f"Index: {result['index']}, Model Output: {result['output']}, Embedding Similarity: {result['embedding_similarity']}, CAM Result: {result['cam_result']}")
