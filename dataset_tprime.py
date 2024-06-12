@@ -331,13 +331,31 @@ class TPrimeDataset(Dataset):
             label = [label, label]
         return obs, label
     
-    def augment_signal_cache_item(self, idx, augmented_signal):
-        #function used only during XAI testing to view point effects on augmenting data
+    def augment_signal_cache_item(self, idx):
+        # Retrieve the dataset and the specific observation info
         dataset = self.ds_info['ds_indexes'][self.ds_type]
         s_idx = self.ds_info['ixs_maps'][self.ds_type][idx]
         obs_info = dataset['data'][s_idx]
-        self.signal_cache.put(obs_info['path'], {'np': augmented_signal, 'mat': ''})
 
+        # Get the original signal from the cache
+        sig_dict = self.signal_cache.get(obs_info['path'])
+        original_signal = sig_dict['np'] if sig_dict is not None else None
+        #print(original_signal, len(original_signal))
+        if original_signal is not None:
+            # Calculate the average power of the original signal
+            rms = np.sqrt(np.mean(np.abs(original_signal) ** 2))
+            signal_power = rms ** 2  # Power of the signal in Watts
+
+            # Generate noise with the same power and length as the original signal
+            noise_std = np.sqrt(signal_power / 2)
+            noise_signal = np.random.normal(0, noise_std, size=original_signal.shape) + \
+                        1j * np.random.normal(0, noise_std, size=original_signal.shape)
+            
+            # Update the signal cache with the noise signal
+            self.signal_cache.put(obs_info['path'], {'np': noise_signal, 'mat': ''})
+            #print(noise_signal, len(noise_signal))
+        else:
+            raise ValueError("Original signal not found in cache for path: " + obs_info['path'])
     # Function to change the shape of obs
     # the input is obs with shape (channel, slice)
     def chan2sequence(self, chan):
