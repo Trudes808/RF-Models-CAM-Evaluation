@@ -1,9 +1,12 @@
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 import os
 
 
-def load_pretrained_model(model_path):
+def load_pretrained_model(config):
     # ***********************************************
     # Placeholder: Load your model here
     # This should be replaced with the specific model loading mechanism
@@ -11,10 +14,10 @@ def load_pretrained_model(model_path):
     #*****************************************************
 
     #*************************************************** t-prime example
-    from model import Baseline_CNN1D
-
+    from model_under_test.model import Baseline_CNN1D
     #t-prime
-    PATH = './results/t-prime/SNR30/'
+    pretrained_model_path = config["pretrained_model_path"]
+    #PATH = './results/t-prime/SNR30/'
     Nclass = 4
     num_channels = 2
     num_feats = 1
@@ -25,7 +28,7 @@ def load_pretrained_model(model_path):
     # cur_dir = os.getcwd()
 
     model = Baseline_CNN1D(classes=Nclass, numChannels=num_channels, slice_len=slice_len)
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(pretrained_model_path)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device) # reload the model on the appropriate device
     model.device = device
@@ -44,9 +47,10 @@ def load_dataloader(config):
     #*****************************************************
 
     #*************************************************** t-prime example
-    from dataset_tprime import TPrimeDataset
+    from model_under_test.dataset_tprime import TPrimeDataset
     import argparse
 
+    #TODO: Change from hardcode to config read
     args=argparse.Namespace()
     args.protocols = ['802_11ax', '802_11b_upsampled', '802_11n', '802_11g']
     args.noise = True

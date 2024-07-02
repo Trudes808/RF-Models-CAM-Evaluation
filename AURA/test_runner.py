@@ -83,4 +83,4 @@ if __name__ == "__main__":
 
     # # Optionally, save and summarize results
     # save_test_results(test_results)
-    # print_summary(test_results)
+    print_summary(test_results)
