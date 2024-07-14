@@ -1,7 +1,7 @@
 {
     "pretrained_model_path": "/home/sagetrudeau/Projects/XAI/RF-Models-CAM-Evaluation/model/model.baseline_cnn1d.nochan.range.pt",
     "test_name": "awgn_tprime_debug",
-    "num_instances_per_class": 1000,
+    "num_instances_per_class": 5,
     "dataset": {
         "protocols": ["802_11ax", "802_11b_upsampled", "802_11n", "802_11g"],
         "noise": true,
@@ -23,12 +23,39 @@
     },
     "augmentation_test_params": {
         "noise": {
-            "relative_power": 1,
-            "_comment_rel_pow":"much slower if not =1"
+            "enable_test": false,
+            "relative_power": 0,
+            "_comment_rel_pow":"power of noise replacement in dB in referance to the original signal. For example 0 is equal, 20 is strong noise, -20 is weak noise"
         },
         "CFO": {
+            "enable_test": false,
             "sample_rate": 11e6,
-            "cfo_range":[-50000,50000]
+            "cfo_range_Hz":[-50000,50000],
+            "_comment_cfo_range":"random uniform chosen between [min, max]"
+        },
+        "SNR": {
+            "enable_test": false,
+            "desired_SNR_dB": -30
+        },
+       
+        "phase_rotation": {
+            "enable_test": false,
+            "angle_range_deg": [-180,180,5],
+            "_comment_angle_range":"[min,max,step] gets input to range(min,max,step) then selected randomly"
+        },
+        "FSPL": {
+            "enable_test": false,
+            "distance_range_m": [0,2],
+            "_comment_distance_range":"[min,max] gets input to range(min,max) then selected randomly for attenuation of signal",
+            "alpha": 2,
+            "_comment_alpha":"path loss coeficient, goes into simplified calculation of 1/d^alpha. alpha=2 is open air. indoor los ~1.6. Urban area ~2.7-3.5. Indoor obstructed ~4-6"
+        },
+        "IQ_imbalance": {
+            "enable_test": true,
+            "gain_factor": 1.02,
+            "_comment_gain_factor": "Gain imbalance factor, where 1.02 indicates a 2% increase from the ideal gain, typical range is 1.00 to 1.02 for minimal to noticeable, up to 1.05 for lower quality SDRs.",
+            "phase_deg": 3,
+            "_comment_phase_deg": "Phase imbalance in degrees, where 3 degrees is a realistic setting for many commercial SDRs. Typical range is ±0.5 to ±5 degrees, can go up to ±10 degrees in less sophisticated systems."
         }
         
     },
