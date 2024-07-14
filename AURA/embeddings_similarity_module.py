@@ -26,12 +26,12 @@ class EmbeddingSimilarityModule:
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(self.dataloader):
                 batch_size = len(data)
-                print("batch_idx, ", batch_idx)
+                #print("batch_idx, ", batch_idx)
                 # Ensure data is converted to float and moved to the correct device
                 data = data.float().to(self.model.device)  # Convert data to float here
                 for name, layer in self.model.named_children():
                     #initial_layer_flag =True
-                    print(f"Running layer: {name}",layer)
+                    #print(f"Running layer: {name}",layer)
                     #handle any special case layers to skip or transform as appropriate for your model
                     if "LayerNorm" in name:
                         continue
@@ -118,7 +118,7 @@ class EmbeddingSimilarityModule:
             data = data.float().to(self.model.device)  # Convert data to float here
             for name, layer in self.model.named_children():
                 #initial_layer_flag =True
-                print(f"Running layer: {name}",layer)
+                #print(f"Running layer: {name}",layer)
                 #handle any special case layers to skip or transform as appropriate for your model
                 if "LayerNorm" in name:
                     continue
@@ -136,7 +136,7 @@ class EmbeddingSimilarityModule:
             labels.append(target)
         features = np.concatenate(features, axis=0)
         #labels = np.concatenate(labels, axis=0)
-        print(labels)
+        #print(labels)
         return features, labels
 
 

@@ -1,5 +1,7 @@
 {
     "pretrained_model_path": "/home/sagetrudeau/Projects/XAI/RF-Models-CAM-Evaluation/model/model.baseline_cnn1d.nochan.range.pt",
+    "test_name": "awgn_tprime_debug",
+    "num_instances_per_class": 1000,
     "dataset": {
         "protocols": ["802_11ax", "802_11b_upsampled", "802_11n", "802_11g"],
         "noise": true,
@@ -21,16 +23,18 @@
     },
     "augmentation_test_params": {
         "noise": {
-            "relative_power": 0.001
+            "relative_power": 1,
+            "_comment_rel_pow":"much slower if not =1"
+        },
+        "CFO": {
+            "sample_rate": 11e6,
+            "cfo_range":[-50000,50000]
         }
         
     },
     "embedding_similarity_params": {
         "target_layer_to_extract": "relu3",
-        "n_batches_to_test": 3,
-        "noise": {
-            "relative_power": 0.001
-        }
+        "n_batches_to_test": 3
         
     }
 }
