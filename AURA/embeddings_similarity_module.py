@@ -140,19 +140,45 @@ class EmbeddingSimilarityModule:
         return features, labels
 
 
-    def plot_tsne(self,features,labels):
-        fig, ax = plt.subplots(1, 3, figsize=(20,7), constrained_layout=True)
-        for c, per in zip(itertools.count(), [5, 30, 50]):
-            tsne = cuml.manifold.TSNE(n_components=2,
-                        perplexity=per,
-                        n_neighbors=per*4)
-            tsne = tsne.fit_transform(features)
-            scatter = ax[c].scatter(tsne[:-1, 0], tsne[:-1, 1], c=labels[:-1], cmap='tab10', s=0.3)
-            scatter = ax[c].scatter(tsne[-1, 0], tsne[-1, 1], c=labels[-1], cmap='tab10',marker='*', edgecolors='k', s=50)
-            ax[c].set_title(f'Perplexity: {per}', fontsize=16)    
+  
+    
+    def plot_tsne(self, features, labels, num_original, test_type):
+        """Plots t-SNE for the given features and labels, distinguishing original from augmented samples."""
+        fig, ax = plt.subplots(figsize=(10, 7))
+        tsne = cuml.manifold.TSNE(n_components=2, perplexity=30, n_neighbors=120)
+        tsne_results = tsne.fit_transform(features)
 
-        fig.suptitle('t-SNE Dimensionality reduction', fontweight='bold', fontsize=25)
-        cbar = fig.colorbar(scatter, boundaries=np.arange(11)-0.5, location='right')
-        cbar.set_ticks(np.arange(10))
-        cbar.set_ticklabels(np.arange(10))
+        # Extract points and labels
+        original_points = tsne_results[:num_original, :]
+        augmented_points = tsne_results[num_original:, :]
+        original_labels = labels[:num_original]
+        augmented_labels = labels[num_original:]
+
+        # Define a colormap
+        cmap = plt.get_cmap('tab10')
+
+        # Calculate the number of unique labels and their respective color in the colormap
+        unique_labels = np.unique(labels)
+        colors = [cmap(i / len(unique_labels)) for i in range(len(unique_labels))]
+        label_to_color = dict(zip(unique_labels, colors))
+
+        # Settings for the plot
+        edge_colors = ["white", "black"]  # Different edge colors for original and augmented
+        markers = ['o', 'o']  # Same markers for original and augmented
+        alpha_values = [1.0, 1.0]  # Different opacity for original and augmented
+
+        # Plot each category with consistent color but different styles for original and augmented
+        for label in unique_labels:
+            idx_org = original_labels == label
+            idx_aug = augmented_labels == label
+            color = label_to_color[label]
+            ax.scatter(original_points[idx_org, 0], original_points[idx_org, 1], 
+                    color=color, marker=markers[0], edgecolor=edge_colors[0], alpha=alpha_values[0], 
+                    label=f'Label {label} Original' if np.sum(idx_org) > 0 else "")
+            ax.scatter(augmented_points[idx_aug, 0], augmented_points[idx_aug, 1], 
+                    color=color, marker=markers[1], edgecolor=edge_colors[1], alpha=alpha_values[1], 
+                    label=f'Label {label} Augmented' if np.sum(idx_aug) > 0 else "")
+
+        ax.set_title(f't-SNE Visualization for {test_type}')
+        ax.legend(loc='upper right')
         plt.show()
