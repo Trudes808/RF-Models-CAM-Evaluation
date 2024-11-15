@@ -13,29 +13,41 @@ def load_pretrained_model(config):
     # model = torch.nn.Linear(2048, 10)  # Example: simple linear model with 2048 input features
     #*****************************************************
 
-    #*************************************************** t-prime example
-    from model_under_test.model import Baseline_CNN1D
-    #t-prime
+    # #*************************************************** t-prime example
+    # from model_under_test.model import Baseline_CNN1D
+    # #t-prime
+    # pretrained_model_path = config["pretrained_model_path"]
+    # #PATH = './results/t-prime/SNR30/'
+    # Nclass = 4
+    # num_channels = 2
+    # num_feats = 1
+    # slice_len = 512
+
+    # device = torch.device('cpu')
+    # # print(device)
+    # # cur_dir = os.getcwd()
+
+    # model = Baseline_CNN1D(classes=Nclass, numChannels=num_channels, slice_len=slice_len)
+    # checkpoint = torch.load(pretrained_model_path)
+    # model.load_state_dict(checkpoint['model_state_dict'])
+    # model.to(device) # reload the model on the appropriate device
+    # model.device = device
+    # model.eval()    # set the evaluation mode
+    # print(model,next(model.parameters()).device)
+    # print(model.device)
+    # #***************************************
+    from model_under_test.model import AlexNet1D
     pretrained_model_path = config["pretrained_model_path"]
-    #PATH = './results/t-prime/SNR30/'
-    Nclass = 4
-    num_channels = 2
-    num_feats = 1
-    slice_len = 512
-
     device = torch.device('cpu')
-    # print(device)
-    # cur_dir = os.getcwd()
+    Nclass = config["model_params"]["num_classes"]
 
-    model = Baseline_CNN1D(classes=Nclass, numChannels=num_channels, slice_len=slice_len)
-    checkpoint = torch.load(pretrained_model_path)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    model.to(device) # reload the model on the appropriate device
-    model.device = device
-    model.eval()    # set the evaluation mode
+    model = AlexNet1D(num_classes=Nclass)
+    state_dict = torch.load(pretrained_model_path, map_location=device)
+    model.load_state_dict(state_dict)
+
+    model.to(device)
+    model.eval()    # Set the evaluation mode
     print(model,next(model.parameters()).device)
-    print(model.device)
-    #***************************************
 
     return model
 
@@ -46,39 +58,62 @@ def load_dataloader(config):
     # This should be replaced with the specific model dataloader loading mechanism
     #*****************************************************
 
-    #*************************************************** t-prime example
-    from model_under_test.dataset_tprime import TPrimeDataset
-    import argparse
+    # #*************************************************** t-prime example
+    # from model_under_test.dataset_tprime import TPrimeDataset
+    # import argparse
 
-    #TODO: Change from hardcode to config read
-    args=argparse.Namespace()
-    args.protocols = ['802_11ax', '802_11b_upsampled', '802_11n', '802_11g']
-    args.noise = True
-    args.snr_db = [30]
-    args.raw_path = "/home/sagetrudeau/Projects/t-prime/data/DATASET1_1"
-    args.slicelen = 512
-    args.overlap_ratio = 0.0
-    args.postfix = ''
-    args.raw_data_ratio = 1.0
-    args.channel = None
-    args.out_mode = 'real'
-    args.worker_batch_size = 512
+    # #TODO: Change from hardcode to config read
+    # args=argparse.Namespace()
+    # args.protocols = ['802_11ax', '802_11b_upsampled', '802_11n', '802_11g']
+    # args.noise = True
+    # args.snr_db = [30]
+    # args.raw_path = "/home/sagetrudeau/Projects/t-prime/data/DATASET1_1"
+    # args.slicelen = 512
+    # args.overlap_ratio = 0.0
+    # args.postfix = ''
+    # args.raw_data_ratio = 1.0
+    # args.channel = None
+    # args.out_mode = 'real'
+    # args.worker_batch_size = 512
 
-    ds_test = TPrimeDataset(args.protocols,
-                          ds_path=args.raw_path,
-                          ds_type='test',
-                          snr_dbs=args.snr_db,
-                          slice_len=args.slicelen,
-                          slice_overlap_ratio=float(args.overlap_ratio),
-                          raw_data_ratio=args.raw_data_ratio,
-                          file_postfix=args.postfix,
-                          override_gen_map=False,    # it will use the same as above call
-                          apply_wchannel=args.channel,
-                          apply_noise=args.noise,
-                          out_mode=args.out_mode)
-    dataloader = DataLoader(ds_test, batch_size=args.worker_batch_size, shuffle=False)
-    dataloader_aug = DataLoader(ds_test, batch_size=args.worker_batch_size, shuffle=False)
-    print(dataloader.dataset[0])
+    # ds_test = TPrimeDataset(args.protocols,
+    #                       ds_path=args.raw_path,
+    #                       ds_type='test',
+    #                       snr_dbs=args.snr_db,
+    #                       slice_len=args.slicelen,
+    #                       slice_overlap_ratio=float(args.overlap_ratio),
+    #                       raw_data_ratio=args.raw_data_ratio,
+    #                       file_postfix=args.postfix,
+    #                       override_gen_map=False,    # it will use the same as above call
+    #                       apply_wchannel=args.channel,
+    #                       apply_noise=args.noise,
+    #                       out_mode=args.out_mode)
+    # dataloader = DataLoader(ds_test, batch_size=args.worker_batch_size, shuffle=False)
+    # dataloader_aug = DataLoader(ds_test, batch_size=args.worker_batch_size, shuffle=False)
+    # print(dataloader.dataset[0])
+    # #*************************************************** t-prime example end
+
+    from model_under_test.dataset_oracle import InDistributionTestDataset, DataLoader,InDistributionTrainDataset,InDistributionTestDatasetContinuous
+    from scipy.io import loadmat
+    import pickle
+
+    seqs = {}
+    with open(config["dataset"]["raw_path"]+"train.pkl", "rb") as f:#Oracle
+    #with open("/raid/backup_storage_oldDGX/LORA/Year_1_outdoor/outdoor_dataset_1/mat_files/raw/train.pkl", "rb") as f:
+        file_dict = pickle.load(f)
+    filenames = file_dict["files"]
+    print("labels:", file_dict["labels"])
+    #print(filenames)
+    for i, name in enumerate(filenames):
+        #print(i, len(filenames))
+        seqs[name] = loadmat(name)["f_sig"][0]
+    #dataset = InDistributionTestDataset(seqs,"val")
+    dataset = InDistributionTestDatasetContinuous(seqs, "val")
+    #dataset = InDistributionTrainDataset(seqs)
+    train_dataset = InDistributionTrainDataset(seqs)
+    del seqs
+
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
     return dataloader
 
 def analyze_model_input_shape(model):

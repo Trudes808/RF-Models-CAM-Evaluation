@@ -171,11 +171,18 @@ class InDistributionTestDatasetContinuous(Dataset):
 
                 real = np.real(transmission) * 1000
                 imag = np.imag(transmission) * 1000
-                seq_slices.append(np.copy(np.stack((real, imag), axis=0)))
+                #seq_slices.append(np.copy(np.stack((real, imag), axis=0)))commented out to prevent minibatching based on files
             
-            # Append the list of slices as a single entry
-            self.sequences.append(np.stack(seq_slices, axis=0))
-            self.labels.append(label)
+                ## Append the list of slices as a single entry
+                #self.sequences.append(np.stack(seq_slices, axis=0))
+
+                #instead do single samples
+                # Stack real and imaginary parts along a new axis
+                sample = np.stack((real, imag), axis=0)  # Shape: [2, seq_len]
+                
+                # Append the individual slice and its label
+                self.sequences.append(sample)
+                self.labels.append(label)
 
         self.seq_len = seq_len
         self.example_len = example_len
@@ -186,6 +193,47 @@ class InDistributionTestDatasetContinuous(Dataset):
     def __getitem__(self, item):
         # Return the stack of all slices for the given item
         return self.sequences[item], self.labels[item]
+
+# class FlattenedInDistributionTestDataset(Dataset):
+#     def __init__(self, seqs, split, seq_len=256, example_len=2000,
+#                  data_dir="/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/"):
+#         with open(data_dir + "train.pkl", "rb") as f:
+#             file_dict = pickle.load(f)
+#         filenames = file_dict["files"]
+#         self.sequences = []
+#         labels = file_dict["labels"]
+#         self.labels = []
+
+#         for name, label in zip(filenames, labels):
+#             seq = seqs[name]
+#             if split == "val":
+#                 seq = seq[int(.6 * len(seq) * FRACTION): int(.7 * len(seq) * FRACTION)]
+            
+#             seq_slices = []
+#             for i in range(0, len(seq), seq_len):
+#                 slice_end = i + seq_len
+#                 if slice_end > len(seq):
+#                     break  # Avoid slicing beyond the sequence length
+#                 transmission = seq[i:slice_end]
+
+#                 real = np.real(transmission) * 1000
+#                 imag = np.imag(transmission) * 1000
+#                 seq_slices.append(np.copy(np.stack((real, imag), axis=0)))
+            
+#             # Append the list of slices as a single entry
+#             self.sequences.append(np.stack(seq_slices, axis=0))
+#             self.labels.append(label)
+
+#         self.seq_len = seq_len
+#         self.example_len = example_len
+
+#     def __len__(self):
+#         return len(self.sequences)
+
+#     def __getitem__(self, item):
+#         # Return the stack of all slices for the given item
+#         return self.sequences[item], self.labels[item]
+
 
 
 class OutOfDistributionDataset(Dataset):

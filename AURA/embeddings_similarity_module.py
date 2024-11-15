@@ -90,21 +90,70 @@ class EmbeddingSimilarityModule:
         labels = np.concatenate(labels, axis=0)
         return features, labels
 
-    def extract_features(self, sample, label):
+    # def extract_features(self, sample, label): #tprime version
+    #     features = []
+    #     labels = []
+    #     i=0
+    #     data= sample
+    #     target = label
+    #     # Convert data to torch tensor and ensure it has the correct shape
+    #     if isinstance(data, np.ndarray):
+    #         data = torch.from_numpy(data).float()
+    #     else:
+    #         data = data.float()
+
+    #     # Check the device of the model
+    #     device = next(self.model.parameters()).device
+    #     # Move the tensor to the same device as the model
+    #     data = data.to(device)
+
+    #     # Ensure the input shape matches the model's expected dimensions
+    #     if len(data.shape) == 2:
+    #         data = data.unsqueeze(0)
+    #     elif len(data.shape) == 1:
+    #         data = data.unsqueeze(0).unsqueeze(0)
+
+    #     with torch.no_grad():
+    #         # Ensure data is converted to float and moved to the correct device
+    #         data = data.float().to(self.model.device)  # Convert data to float here
+    #         for name, layer in self.model.named_children():
+    #             #initial_layer_flag =True
+    #             print(f"Running layer: {name}",layer)
+    #             #handle any special case layers to skip or transform as appropriate for your model
+    #             if "LayerNorm" in name:
+    #                 continue
+    #             if "feature_extractor" in name:
+    #                 continue
+    #             if "fc1" in name:
+    #                 data= torch.flatten(data, 1)
+    #             data=layer(data)
+                
+    #             #break out after target layer reached
+    #             if self.config["embedding_similarity_params"]["target_layer_to_extract"] in name:
+    #                 break
+        
+    #         features.append(data.cpu().numpy())
+    #         labels.append(target)
+    #     features = np.concatenate(features, axis=0)
+    #     #labels = np.concatenate(labels, axis=0)
+    #     #print(labels)
+    #     return features, labels
+    
+    def extract_features(self, sample, label): #oracle version
+        import torch.nn as nn
         features = []
         labels = []
-        i=0
-        data= sample
+        data = sample
         target = label
+
         # Convert data to torch tensor and ensure it has the correct shape
         if isinstance(data, np.ndarray):
             data = torch.from_numpy(data).float()
         else:
             data = data.float()
 
-        # Check the device of the model
-        device = next(self.model.parameters()).device
         # Move the tensor to the same device as the model
+        device = next(self.model.parameters()).device
         data = data.to(device)
 
         # Ensure the input shape matches the model's expected dimensions
@@ -114,30 +163,46 @@ class EmbeddingSimilarityModule:
             data = data.unsqueeze(0).unsqueeze(0)
 
         with torch.no_grad():
-            # Ensure data is converted to float and moved to the correct device
-            data = data.float().to(self.model.device)  # Convert data to float here
+            # Iterate through all layers in the model
             for name, layer in self.model.named_children():
-                #initial_layer_flag =True
-                #print(f"Running layer: {name}",layer)
-                #handle any special case layers to skip or transform as appropriate for your model
+                print(f"Running layer: {name}", layer)
+                
+                # Skip LayerNorm if present
                 if "LayerNorm" in name:
                     continue
-                if "feature_extractor" in name:
-                    continue
-                if "fc1" in name:
-                    data= torch.flatten(data, 1)
-                data=layer(data)
                 
-                #break out after target layer reached
-                if self.config["embedding_similarity_params"]["target_layer_to_extract"] in name:
-                    break
-        
-            features.append(data.cpu().numpy())
-            labels.append(target)
+                # If the layer is feature_extractor, iterate through its sub-layers
+                if "feature_extractor" in name:
+                    for sub_idx, sub_layer in enumerate(layer):
+                        data = sub_layer(data)
+                        current_layer_name = f"{name}.{sub_idx}"
+                        print(f"Running sub layer: {current_layer_name}", sub_layer)
+                        
+                        # Check if the current sub-layer is the target layer
+                        if self.config["embedding_similarity_params"]["target_layer_to_extract"] == current_layer_name:
+                            features.append(data.cpu().numpy())
+                            labels.append(target)
+                            return np.concatenate(features, axis=0), labels
+                else:
+                    # For fully connected layers
+                    if isinstance(layer, nn.Linear):
+                        data = torch.flatten(data, 1)
+                    data = layer(data)
+                    
+                    # Check if this layer is the target layer
+                    if self.config["embedding_similarity_params"]["target_layer_to_extract"] == name:
+                        features.append(data.cpu().numpy())
+                        labels.append(target)
+                        #return np.concatenate(features, axis=0), labels
+                        break
+
+            # # If target layer wasn't found inside feature_extractor
+            # features.append(data.cpu().numpy())
+            # labels.append(target)
+
         features = np.concatenate(features, axis=0)
-        #labels = np.concatenate(labels, axis=0)
-        #print(labels)
         return features, labels
+    
 
 
   
