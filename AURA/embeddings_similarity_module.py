@@ -165,7 +165,7 @@ class EmbeddingSimilarityModule:
         with torch.no_grad():
             # Iterate through all layers in the model
             for name, layer in self.model.named_children():
-                print(f"Running layer: {name}", layer)
+                #print(f"Running layer: {name}", layer)
                 
                 # Skip LayerNorm if present
                 if "LayerNorm" in name:
@@ -176,7 +176,7 @@ class EmbeddingSimilarityModule:
                     for sub_idx, sub_layer in enumerate(layer):
                         data = sub_layer(data)
                         current_layer_name = f"{name}.{sub_idx}"
-                        print(f"Running sub layer: {current_layer_name}", sub_layer)
+                        #print(f"Running sub layer: {current_layer_name}", sub_layer)
                         
                         # Check if the current sub-layer is the target layer
                         if self.config["embedding_similarity_params"]["target_layer_to_extract"] == current_layer_name:

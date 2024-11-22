@@ -70,6 +70,13 @@ class DataAugmentationTesting:
         # Calculate power of the original sample
         original_power = np.mean(original_sample**2)
 
+        # print("og_pwr",original_power)
+        # complex_slice = original_sample[0] +1j*original_sample[1]
+        # total_power_original = np.sum(np.abs(complex_slice)**2)
+        # print("total_power_original",total_power_original)
+        # total_power_class_zero = 532.468 #class zero power
+        # class_zero_scale_factor = total_power_original / total_power_class_zero
+
         #compute desired relative power
         # Get the relative power factor from config in dB and convert it to linear scale
         relative_power_dB = self.config["augmentation_test_params"]["noise"]["relative_power"]
@@ -82,6 +89,7 @@ class DataAugmentationTesting:
         noise = np.random.randn(*original_sample.shape)
         # Normalize the noise to have the desired power
         noise = noise * np.sqrt(noise_power / np.mean(noise**2))
+        #noise = noise * np.sqrt(total_power_class_zero / np.mean(noise**2))
         
         # Replace the original sample in the augmented dataset with the noise
         self.awgn_aug_data.add_aug_sample(noise, index)
