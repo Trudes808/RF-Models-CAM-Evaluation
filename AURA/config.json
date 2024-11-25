@@ -30,7 +30,7 @@
         "CFO": {
             "enable_test": true,
             "sample_rate": 11e6,
-            "cfo_range_Hz":[-1000002,-1000000],
+            "cfo_range_Hz":[-5000002,-5000000],
             "__discription":"random uniform chosen between [min, max]"
         },
         "SNR": {
