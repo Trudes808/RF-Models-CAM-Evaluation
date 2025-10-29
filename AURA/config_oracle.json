@@ -1,0 +1,61 @@
+{
+    "pretrained_model_path": "/home/sagetrudeau/Projects/XAI/RF-Models-CAM-Evaluation/model/ORACLE_6_Dev_new_class6_noise_replacement_state_dict_epoch_0.pth",
+    "test_name": "awgn_oracle_JSAC_mimick_power_epoch9_IQ_Imbal_103gain_3deg",
+    "num_instances_per_class": 100,
+    "dataset": {
+        "raw_path": "/home/sagetrudeau/Datasets/ORACLE/mat_files/raw/",
+        "all_class_labels": [0,1,2,3,4,5],
+        "slicelen": 256
+    },
+    "device": "cpu",
+    "model_params": {
+        "num_classes":6,
+        "learning_rate": 0.0001,
+        "batch_size": 3000,
+        "num_epochs": 20
+    },
+    "augmentation_test_params": {
+        "noise": {
+            "enable_test": true,
+            "relative_power": 0,
+            "__discription":"power of noise replacement in dB in referance to the original signal. For example 0 is equal, 20 is strong noise, -20 is weak noise"
+        },
+        "CFO": {
+            "enable_test": false,
+            "sample_rate": 5e6,
+            "cfo_range_Hz":[-100,100],
+            "__discription":"random uniform chosen between [min, max]"
+        },
+        "SNR": {
+            "enable_test": false,
+            "desired_SNR_dB": 10,
+            "__discription":"can only ever reduce SNR to whatever lvl provided is, if level is higher no change"
+        },
+       
+        "phase_rotation": {
+            "enable_test": false,
+            "angle_range_deg": [-15,15,5],
+            "__discription":"[min,max,step] gets input to range(min,max,step) then selected randomly"
+        },
+        "FSPL": {
+            "enable_test": false,
+            "distance_range_m": [10,20],
+            "_comment_distance_range":"[min,max] gets input to range(min,max) then selected randomly for attenuation of signal",
+            "alpha": 2,
+            "__discription":"path loss coeficient, goes into simplified calculation of 1/d^alpha. alpha=2 is open air. indoor los ~1.6. Urban area ~2.7-3.5. Indoor obstructed ~4-6"
+        },
+        "IQ_imbalance": {
+            "enable_test": false,
+            "gain_factor": 1.03,
+            "_comment_gain_factor": "Gain imbalance factor, where 1.02 indicates a 2% increase from the ideal gain, typical range is 1.00 to 1.02 for minimal to noticeable, up to 1.05 for lower quality SDRs.",
+            "phase_deg": 3,
+            "__discription": "Phase imbalance in degrees, where 3 degrees is a realistic setting for many commercial SDRs. Typical range is ±0.5 to ±5 degrees, can go up to ±10 degrees in less sophisticated systems."
+        }
+        
+    },
+    "embedding_similarity_params": {
+        "target_layer_to_extract": "fc2",
+        "n_batches_to_test": 3
+        
+    }
+}
